@@ -16,6 +16,7 @@ RUN rc-update add docker default
 RUN rc-update add kubelet default
 #RUN rc-service kubeadm start
 #RUN rc-service docker start # fails saying docker is already starting
+RUN rc-service docker restart
 #RUN service docker start # also fails saying docker is already starting
 
 # [ERROR FileContent--proc-sys-net-bridge-bridge-nf-call-iptables]: /proc/sys/net/bridge/bridge-nf-call-iptables does not exist
@@ -28,19 +29,25 @@ RUN cat /etc/modules-load.d/containerd.conf
 #RUN modprobe overlay
 #RUN modprobe br_netfilter
 
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
+RUN lsmod | grep br_netfilter
+# yields:
+# br_netfilter 24576 0
+# bridge 126976 1 br_netfilter
+RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >  /etc/sysctl.d/k8s.conf
+RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >> /etc/sysctl.d/k8s.conf
+# RUN sysctl --system crashes with sysctl: unrecognized option: system
+RUN sysctl -p /etc/sysctl.d/k8s.conf
+# yields:
+# sysctl: error: 'net.bridge/bridge-nf-call-ip6tables' is an unknown key
+# sysctl: error: 'net.bridge/bridge-nf-call-iptables' is an unknown key
+
 # Setup required sysctl params, these persist across reboots.
 RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >  /etc/sysctl.d/99-kubernetes-cri.conf
 RUN echo "net.ipv4.ip_forward                 = 1" >> /etc/sysctl.d/99-kubernetes-cri.conf
 RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >> /etc/sysctl.d/99-kubernetes-cri.conf
 RUN sysctl -p
 RUN sysctl -p /etc/sysctl.d/99-kubernetes-cri.conf
-
-# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
-RUN lsmod | grep br_netfilter
-RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >  /etc/sysctl.d/k8s.conf
-RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >> /etc/sysctl.d/k8s.conf
-# RUN sysctl --system crashes with sysctl: unrecognized option: system
-RUN sysctl -p /etc/sysctl.d/k8s.conf
 
 # [ERROR Swap]: running with swap on is not supported. Please disable swap
 # disable swap:
