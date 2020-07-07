@@ -31,6 +31,11 @@ RUN cat /etc/modules-load.d/containerd.conf
 RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >  /etc/sysctl.d/99-kubernetes-cri.conf
 RUN echo "net.ipv4.ip_forward                 = 1" >> /etc/sysctl.d/99-kubernetes-cri.conf
 RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >> /etc/sysctl.d/99-kubernetes-cri.conf
-RUN sysctl -p
+RUN sysctl --load
+RUN sysctl --load /etc/sysctl.d/99-kubernetes-cri.conf
+
+# disable swap
+RUN sed --in-place '/swap/d' /etc/fstab
+RUN swapoff --all
 
 #RUN kubeadm init
