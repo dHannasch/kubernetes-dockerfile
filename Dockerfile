@@ -15,9 +15,9 @@ RUN apk --upgrade add --no-cache openrc --repository http://dl-cdn.alpinelinux.o
 RUN rc-update add docker default
 RUN rc-update add kubelet default
 #RUN rc-service kubeadm start
-#RUN rc-service docker start # fails saying docker is already starting
-RUN rc-service docker restart
-#RUN service docker start # also fails saying docker is already starting
+#RUN rc-service docker start   # crashes saying "docker is already starting"
+#RUN rc-service docker restart # crashes saying "docker is already starting"
+#RUN service docker start      # crashes saying "docker is already starting"
 
 # [ERROR FileContent--proc-sys-net-bridge-bridge-nf-call-iptables]: /proc/sys/net/bridge/bridge-nf-call-iptables does not exist
 # Load required modules
