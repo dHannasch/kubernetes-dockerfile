@@ -12,5 +12,10 @@ RUN apk --upgrade add --no-cache openrc --repository http://dl-cdn.alpinelinux.o
 RUN rc-update add docker default
 #RUN rc-service kubeadm start
 #RUN rc-service docker start # fails saying docker is already starting
-RUN service docker start
+#RUN service docker start # also fails saying docker is already starting
+RUN cat > /etc/modules-load.d/containerd.conf <<EOF \
+    && overlay \
+    && br_netfilter \
+    && EOF
+
 #RUN kubeadm init
