@@ -18,6 +18,7 @@ RUN rc-update add kubelet default
 #RUN rc-service docker start # fails saying docker is already starting
 #RUN service docker start # also fails saying docker is already starting
 
+# [ERROR FileContent--proc-sys-net-bridge-bridge-nf-call-iptables]: /proc/sys/net/bridge/bridge-nf-call-iptables does not exist
 # Load required modules
 # https://github.com/moby/moby/issues/1799
 RUN echo overlay > /etc/modules-load.d/containerd.conf
@@ -34,7 +35,8 @@ RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >> /etc/sysctl.d/99-kubernete
 RUN sysctl --load
 RUN sysctl --load /etc/sysctl.d/99-kubernetes-cri.conf
 
-# disable swap
+# [ERROR Swap]: running with swap on is not supported. Please disable swap
+# disable swap:
 RUN sed --in-place '/swap/d' /etc/fstab
 RUN swapoff --all
 
