@@ -38,6 +38,6 @@ RUN sysctl -p /etc/sysctl.d/99-kubernetes-cri.conf
 # [ERROR Swap]: running with swap on is not supported. Please disable swap
 # disable swap:
 RUN sed --in-place '/swap/d' /etc/fstab
-RUN swapoff --all
+RUN swapoff -a
 
 #RUN kubeadm init
