@@ -35,6 +35,11 @@ RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >> /etc/sysctl.d/99-kubernete
 RUN sysctl -p
 RUN sysctl -p /etc/sysctl.d/99-kubernetes-cri.conf
 
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#letting-iptables-see-bridged-traffic
+RUN lsmod | grep br_netfilter
+RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >  /etc/sysctl.d/k8s.conf
+RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >> /etc/sysctl.d/k8s.conf
+
 # [ERROR Swap]: running with swap on is not supported. Please disable swap
 # disable swap:
 RUN sed --in-place '/swap/d' /etc/fstab
