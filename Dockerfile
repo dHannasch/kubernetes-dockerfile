@@ -39,7 +39,8 @@ RUN sysctl -p /etc/sysctl.d/99-kubernetes-cri.conf
 RUN lsmod | grep br_netfilter
 RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >  /etc/sysctl.d/k8s.conf
 RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >> /etc/sysctl.d/k8s.conf
-RUN sysctl --system
+# RUN sysctl --system crashes with sysctl: unrecognized option: system
+RUN sysctl -p /etc/sysctl.d/k8s.conf
 
 # [ERROR Swap]: running with swap on is not supported. Please disable swap
 # disable swap:
