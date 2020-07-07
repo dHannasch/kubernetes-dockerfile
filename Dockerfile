@@ -15,10 +15,20 @@ RUN rc-update add kubelet default
 #RUN rc-service kubeadm start
 #RUN rc-service docker start # fails saying docker is already starting
 #RUN service docker start # also fails saying docker is already starting
+
+# Load required modules
+# https://github.com/moby/moby/issues/1799
 RUN echo overlay > /etc/modules-load.d/containerd.conf
 RUN echo br_netfilter >> /etc/modules-load.d/containerd.conf
 RUN cat /etc/modules-load.d/containerd.conf
-RUN modprobe overlay
-RUN modprobe br_netfilter
+# impossible to modprobe? https://gitlab.alpinelinux.org/alpine/aports/-/issues/10861
+#RUN modprobe overlay
+#RUN modprobe br_netfilter
+
+# Setup required sysctl params, these persist across reboots.
+RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >  /etc/sysctl.d/99-kubernetes-cri.conf
+RUN echo "net.ipv4.ip_forward                 = 1" >> /etc/sysctl.d/99-kubernetes-cri.conf
+RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >> /etc/sysctl.d/99-kubernetes-cri.conf
+RUN sysctl -p
 
 #RUN kubeadm init
