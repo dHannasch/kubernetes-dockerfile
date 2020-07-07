@@ -34,6 +34,7 @@ RUN lsmod | grep br_netfilter
 # yields:
 # br_netfilter 24576 0
 # bridge 126976 1 br_netfilter
+RUN lsmod | grep overlay
 RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >  /etc/sysctl.d/k8s.conf
 RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >> /etc/sysctl.d/k8s.conf
 # RUN sysctl --system crashes with sysctl: unrecognized option: system
