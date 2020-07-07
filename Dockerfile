@@ -13,9 +13,10 @@ RUN rc-update add docker default
 #RUN rc-service kubeadm start
 #RUN rc-service docker start # fails saying docker is already starting
 #RUN service docker start # also fails saying docker is already starting
-RUN cat > /etc/modules-load.d/containerd.conf <<EOF \
-    && overlay \
-    && br_netfilter \
-    && EOF
+RUN echo overlay > /etc/modules-load.d/containerd.conf
+RUN echo br_netfilter >> /etc/modules-load.d/containerd.conf
+RUN cat /etc/modules-load.d/containerd.conf
+RUN modprobe overlay
+RUN modprobe br_netfilter
 
 #RUN kubeadm init
