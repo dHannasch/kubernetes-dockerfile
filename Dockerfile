@@ -42,6 +42,7 @@ RUN sysctl -p /etc/sysctl.d/k8s.conf
 # yields:
 # sysctl: error: 'net.bridge/bridge-nf-call-ip6tables' is an unknown key
 # sysctl: error: 'net.bridge/bridge-nf-call-iptables' is an unknown key
+# even though lsmod | grep br_netfilter and lsmod | grep overlay appear to indicate success
 
 # Setup required sysctl params, these persist across reboots.
 RUN echo "net.bridge.bridge-nf-call-iptables  = 1" >  /etc/sysctl.d/99-kubernetes-cri.conf
@@ -49,6 +50,11 @@ RUN echo "net.ipv4.ip_forward                 = 1" >> /etc/sysctl.d/99-kubernete
 RUN echo "net.bridge.bridge-nf-call-ip6tables = 1" >> /etc/sysctl.d/99-kubernetes-cri.conf
 RUN sysctl -p
 RUN sysctl -p /etc/sysctl.d/99-kubernetes-cri.conf
+# yields:
+# sysctl: error: 'net.bridge/bridge-nf-call-iptables' is an unknown key
+# sysctl: error setting key 'net.ipv4.ip_forward': Read-only file system
+# sysctl: error: 'net.bridge/bridge-nf-call-ip6tables' is an unknown key
+# even though lsmod | grep br_netfilter and lsmod | grep overlay appear to indicate success
 
 # [ERROR Swap]: running with swap on is not supported. Please disable swap
 # disable swap:
